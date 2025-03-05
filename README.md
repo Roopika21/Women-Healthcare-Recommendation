@@ -48,11 +48,8 @@ The system empowers women to make informed healthcare decisions, helping them un
 
 Tech Stack
 
-Frontend: HTML, CSS, JavaScript
+Frontend and Backend: HTML, CSS, JavaScript
 
-Backend: Python (Flask/Django)
-
-Database: PostgreSQL/MySQL
 
 Machine Learning: Hierarchical Clustering, Gaussian Mixture Models (GMM)
 
