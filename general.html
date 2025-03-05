@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Reminder & Doctor Recommendation</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        /* Container for all content */
+        .container {
+            width: 60%;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header Styling */
+        h1 {
+            text-align: center;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        /* Input Field Styling */
+        input[type="text"], input[type="number"] {
+            width: 70%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        /* Button Styling */
+        button {
+            padding: 10px 20px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Button Hover Effect */
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Doctor Recommendation Section */
+        #doctor_recommendation, #exercise_recommendation, #severity_message, #health_tip, #emergency_contact, #health_goals {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #reminder_message {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #ff4500;
+        }
+
+        #severity_message, #health_tip {
+            color: #ff4500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Health Reminder & Doctor Recommendation</h1>
+
+        <!-- Health Issue Input Section -->
+        <div class="section">
+            <h2>Enter Your Health Issue</h2>
+            <input type="text" id="health_issue" placeholder="e.g., Pregnant, Fatigue, Back pain, etc." />
+            <button id="submit_health_issue">Get Doctor Recommendations</button>
+            <div id="doctor_recommendation"></div>
+            <div id="exercise_recommendation"></div> <!-- Exercise Recommendation Section -->
+        </div>
+
+        <!-- General Doctor Consultation Section -->
+        <div class="section">
+            <h2>Consult General Doctor</h2>
+            <button id="consult_general_doctor">Get General Doctor Recommendations</button>
+            <div id="general_doctor_recommendation"></div>
+        </div>
+
+        <!-- Symptoms Input Section -->
+        <div class="section">
+            <h2>Enter Your Symptoms</h2>
+            <input type="text" id="symptoms" placeholder="e.g., Dizziness, Nausea, etc." />
+        </div>
+
+        <!-- Severity Input Section -->
+        <div class="section">
+            <h2>Rate Your Symptoms Severity</h2>
+            <input type="number" id="severity" min="1" max="10" placeholder="Severity (1-10)" />
+            <button id="submit_severity">Submit Severity</button>
+            <div id="severity_message"></div>
+        </div>
+
+        <!-- Emergency Contact Section -->
+        <div class="section">
+            <button id="contact_emergency">Contact Emergency</button>
+            <div id="emergency_contact"></div>
+        </div>
+
+        <!-- Health Tip Section -->
+        <div class="section">
+            <h2>Health Tip of the Day</h2>
+            <div id="health_tip"></div>
+        </div>
+
+        <!-- Exercise Reminder Section -->
+        <div class="section">
+            <h2>Exercise Reminder</h2>
+            <button id="start_reminder">Start Exercise Reminder</button>
+            <div id="reminder_message"></div>
+        </div>
+
+        <!-- Health Goal Tracking Section -->
+        <div class="section">
+            <h2>Track Your Health Progress</h2>
+            <input type="text" id="goal_input" placeholder="Enter your health goal" />
+            <button id="submit_goal">Set Goal</button>
+            <div id="health_goals"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // Sample doctor recommendations data
+        const doctorRecommendations = {
+            "pregnant": [
+                { name: "Dr.T.N. Lokeshwari", specialty: "Obstetrician and Gynecologist", hospital: "Kangroo Care" },
+                { name: "Dr. Jayanthi", specialty: "Gynecologist", hospital: "Brindavan Hospital" }
+            ],
+            "fatigue": [
+                { name: "Dr. Roopa Chandrashekar", specialty: "General Practitioner", hospital: "Nimshamba Ayur Clinic" },
+                { name: "Dr. Chandrashekar", specialty: "Sleep Specialist", hospital: "Nimshamba Ayur Clinic" }
+            ],
+            "back pain": [
+                { name: "Dr. Shilpa", specialty: "Orthopedic", hospital: "City Hospital" },
+                { name: "Dr. GuruRaj", specialty: "Chiropractor", hospital: "Rajeev Hospital" }
+            ]
+        };
+
+        // Sample general doctor recommendations data
+        const generalDoctors = [
+            { name: "Dr. Indra", specialty: "General Practitioner", hospital: "Indra Nursing Home" },
+            { name: "Dr. RaviKumar", specialty: "General Physician", hospital: "HealthFirst Clinic" }
+        ];
+
+        // Sample exercise recommendations data
+        const exerciseRecommendations = {
+            "pregnant": ["Walking", "Prenatal Yoga", "Swimming"],
+            "fatigue": ["Stretching", "Walking", "Breathing exercises"],
+            "back pain": ["Back stretches", "Walking", "Gentle yoga"]
+        };
+
+        // Sample health tips data
+        const healthTips = {
+            "fatigue": "Try to get at least 7 hours of sleep each night to help with fatigue.",
+            "pregnant": "Stay hydrated and avoid stress during pregnancy for a healthy experience.",
+            "back pain": "Avoid sitting for long periods and practice good posture."
+        };
+
+        // Handling doctor recommendation request
+        $('#submit_health_issue').click(function() {
+            var healthIssue = $('#health_issue').val().trim().toLowerCase(); // Trim spaces and convert to lowercase
+            var symptoms = $('#symptoms').val().trim().toLowerCase(); // Get symptoms input
+            if (healthIssue === '') {
+                $('#doctor_recommendation').html('<p>Please enter a health issue.</p>');
+                $('#exercise_recommendation').html('');
+                return; // Prevent empty requests
+            }
+
+            // Show a loading message
+            $('#doctor_recommendation').html('<p>Loading...</p>');
+            $('#exercise_recommendation').html('');
+
+            // Check if health issue exists in data
+            if (doctorRecommendations[healthIssue]) {
+                var recommendations = '<ul>';
+                doctorRecommendations[healthIssue].forEach(function(doctor) {
+                    recommendations += '<li>' + doctor.name + ' - ' + doctor.specialty + ' - ' + doctor.hospital + '</li>';
+                });
+                recommendations += '</ul>';
+                $('#doctor_recommendation').html(recommendations);
+
+                // Add exercise recommendations
+                $('#exercise_recommendation').html('<p>Recommended Exercises for you:</p><ul>' + exerciseRecommendations[healthIssue].map(function(exercise) {
+                    return '<li>' + exercise + '</li>';
+                }).join('') + '</ul>');
+
+                // Add health tip if available
+                if (healthTips[healthIssue]) {
+                    $('#health_tip').html('<p>' + healthTips[healthIssue] + '</p>');
+                }
+            } else {
+                $('#doctor_recommendation').html('<p>No recommendations available for this health issue.</p>');
+                $('#exercise_recommendation').html('');
+            }
+        });
+
+        // General doctor consultation request
+        $('#consult_general_doctor').click(function() {
+            var generalDoctorList = '<ul>';
+            generalDoctors.forEach(function(doctor) {
+                generalDoctorList += '<li>' + doctor.name + ' - ' + doctor.specialty + ' - ' + doctor.hospital + '</li>';
+            });
+            generalDoctorList += '</ul>';
+            $('#general_doctor_recommendation').html(generalDoctorList);
+        });
+
+        // Exercise reminder functionality
+        $('#start_reminder').click(function() {
+            $('#reminder_message').html('<p>Exercise reminder has started! You will be reminded every hour.</p>');
+            startExerciseReminder();
+        });
+
+        // Simulate exercise reminder every hour
+        function startExerciseReminder() {
+            setInterval(function() {
+                alert("It's time to take a break and do some exercise!");
+            }, 3600000); // 3600000ms = 1 hour
+        }
+
+        // Emergency contact functionality
+        $('#contact_emergency').click(function() {
+            $('#emergency_contact').html('<p>If you need urgent assistance, please contact your nearest hospital: City Hospital - 123-456-7890</p>');
+        });
+
+        // Severity input handling
+        $('#submit_severity').click(function() {
+            var severity = $('#severity').val();
+            if (severity < 4) {
+                $('#severity_message').html('<p>Your symptoms seem mild. Monitor your condition and consult a doctor if needed.</p>');
+            } else if (severity >= 4 && severity <= 7) {
+                $('#severity_message').html('<p>Your symptoms are moderate. It is advised to consult a general doctor.</p>');
+            } else {
+                $('#severity_message').html('<p>Your symptoms are severe. Please seek immediate medical attention.</p>');
+            }
+        });
+
+        // Health Goal input handling
+        $('#submit_goal').click(function() {
+            var healthGoal = $('#goal_input').val().trim();
+            if (healthGoal !== '') {
+                $('#health_goals').html('<p>Your health goal is: ' + healthGoal + '</p>');
+            } else {
+                $('#health_goals').html('<p>Please enter a health goal.</p>');
+            }
+        });
+    </script>
+</body>
+</html>
